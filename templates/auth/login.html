@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - ActionFlow</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth/login.css') }}">
+</head>
+<body>
+<div class="container">
+    <div class="login-container">
+        <div class="login-header">
+            <h2>ActionsFlow Login</h2>
+        </div>
+
+        <!-- --- Corrected Message Loop --- -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="server-messages {{ category }}">
+                        <p>{{ message }}</p>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <!-- --- End of Correction --- -->
+
+        <form id="loginForm" method="POST" action="{{ url_for('auth.login') }}">
+            <div class="login-content">
+                <div class="form-group">
+                    <label for="email">Email Address <span class="required">*</span></label>
+                    <div class="input-container">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" name="email" placeholder="Enter your organization email">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password <span class="required">*</span></label>
+                    <div class="input-container">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" name="password" placeholder="Enter your password">
+                    </div>
+                </div>
+
+                <div class="options-row">
+                    <div class="remember-me">
+                        <input type="checkbox" id="remember" name="remember">
+                        <label for="remember">Remember me</label>
+                    </div>
+                    <a href="{{ url_for('auth.forgot_password') }}" class="forgot-password">Forgot Password?</a>
+                </div>
+
+                <button type="button" class="login-button" id="loginBtn">LOGIN</button>
+
+                <div class="separator">
+                    <span>Organization Options</span>
+                </div>
+
+                <div class="action-buttons">
+                    <a href="{{ url_for('auth.user_register') }}" class="action-button register-btn">
+                        <i class="fas fa-building"></i> Join Organization
+                    </a>
+                    <a href="{{ url_for('auth.admin_register') }}" class="action-button join-btn">
+                        <i class="fas fa-users"></i> Register Organization
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/auth/login.js') }}"></script>
+</body>
+</html>
