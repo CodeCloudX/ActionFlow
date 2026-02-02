@@ -54,7 +54,7 @@ ActionFlow is a web-based platform designed to streamline complaint resolution w
 
 5.  **Run the application:**
     ```sh
-    flask run
+    python run.py
     ```
 
 ## License
@@ -62,3 +62,4 @@ ActionFlow is a web-based platform designed to streamline complaint resolution w
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 Copyright (c) 2026 CodeCloudX
+
