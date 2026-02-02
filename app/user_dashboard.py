@@ -249,18 +249,9 @@ def organization_info():
     org_id = session.get('org_id')
     organization = Organization.query.get_or_404(org_id)
 
-    user_count = User.query.filter_by(org_id=org_id).count()
-    resolver_count = Resolver.query.filter_by(org_id=org_id).count()
-    complaint_count = Complaint.query.filter_by(org_id=org_id).count()
-    primary_admin = Admin.query.filter_by(org_id=org_id).order_by(Admin.created_at.asc()).first()
-
     return render_template('common/org_info.html',
-                           organization=organization,
-                           user_count=user_count,
-                           resolver_count=resolver_count,
-                           complaint_count=complaint_count,
-                           primary_admin=primary_admin)
-
+                           organization=organization
+                          
 @user_bp.route('/profile')
 @user_required
 def profile():
