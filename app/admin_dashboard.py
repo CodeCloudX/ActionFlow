@@ -8,26 +8,22 @@ from services.common_utils import save_uploaded_file, format_datetime
 
 admin_bp = Blueprint('admin', __name__)
 
-# =======================================
-# Admin Dashboard & Main Pages
-# =======================================
+
 @admin_bp.route('/dashboard')
 @admin_required
 def dashboard():
     org_id = session.get('org_id')
     organization = Organization.query.get_or_404(org_id)
 
-    # Recent activity
     recent_users = User.query.filter_by(org_id=org_id).order_by(User.created_at.desc()).limit(4).all()
     recent_complaints = Complaint.query.filter_by(org_id=org_id).order_by(Complaint.created_at.desc()).limit(5).all()
 
-    # Statistics
     total_complaints = Complaint.query.filter_by(org_id=org_id).count()
     pending_complaints = Complaint.query.filter_by(org_id=org_id, status='pending').count()
     inprogress_complaints = Complaint.query.filter_by(org_id=org_id, status='in_progress').count()
     high_priority_complaints = Complaint.query.filter(
         Complaint.org_id == org_id,
-        Complaint.priority == 'high',  # Changed from 'High' to 'high'
+        Complaint.priority == 'high',
         Complaint.status.in_(['pending', 'in_progress'])
     ).count()
     resolved_complaints = Complaint.query.filter(Complaint.org_id == org_id, Complaint.status.in_(['resolved', 'closed'])).count()
@@ -48,31 +44,26 @@ def complaints():
     org_id = session.get('org_id')
     organization = Organization.query.get_or_404(org_id)
 
-    # Get filter parameters
     status_filter = request.args.get('status', '')
     priority_filter = request.args.get('priority', '')
     category_filter = request.args.get('category', '')
 
-    # Build query
     query = Complaint.query.filter_by(org_id=org_id)
 
-    # Apply filters
     if status_filter:
-        statuses = [status.strip().lower() for status in status_filter.split(',')]  # Added .lower()
+        statuses = [status.strip().lower() for status in status_filter.split(',')]
         if len(statuses) > 1:
             query = query.filter(Complaint.status.in_(statuses))
         elif statuses[0]:
             query = query.filter_by(status=statuses[0])
 
     if priority_filter:
-        # Normalize to lowercase for consistent comparison
-        priority_filter = priority_filter.strip().lower()  # Added this line
-        query = query.filter(Complaint.priority == priority_filter)  # Changed from .ilike(.capitalize())
+        priority_filter = priority_filter.strip().lower()
+        query = query.filter(Complaint.priority == priority_filter)
 
     if category_filter:
         query = query.filter_by(category=category_filter)
 
-    # Get all distinct categories for dropdown
     categories = db.session.query(Complaint.category) \
         .filter_by(org_id=org_id) \
         .distinct() \
@@ -80,7 +71,6 @@ def complaints():
         .all()
     categories = [c[0] for c in categories]
 
-    # Get complaints
     complaints_list = query.order_by(Complaint.created_at.desc()).all()
 
     return render_template('admin/complaints.html',
@@ -91,9 +81,6 @@ def complaints():
                            category_filter=category_filter,
                            categories=categories)
 
-# =======================================
-# Complaint Modal Routes
-# =======================================
 @admin_bp.route('/complaint/<int:complaint_id>/details')
 @admin_required
 def complaint_details(complaint_id):
@@ -103,7 +90,6 @@ def complaint_details(complaint_id):
     if complaint.org_id != session.get('org_id'):
         return jsonify({'success': False, 'message': 'Not authorized'}), 403
 
-    # Fix: Handle None values for image URLs
     complaint_image_url = None
     if complaint.complaint_image:
         complaint_image_url = f"/static/uploads/{complaint.complaint_image.replace('\\', '/')}"
@@ -203,9 +189,6 @@ def assign_complaint(complaint_id):
         db.session.rollback()
         return jsonify({'success': False, 'message': str(e)}), 500
 
-# =======================================
-# NEW: Resolve Complaint Route
-# =======================================
 @admin_bp.route('/complaint/<int:complaint_id>/resolve', methods=['GET', 'POST'])
 @admin_required
 def resolve_complaint(complaint_id):
@@ -255,9 +238,6 @@ def resolve_complaint(complaint_id):
                            complaint=complaint,
                            organization=organization)
 
-# =======================================
-# CRUD for Resolvers - UPDATED FOR MODAL
-# =======================================
 @admin_bp.route('/resolvers')
 @admin_required
 def manage_resolvers():
@@ -433,9 +413,6 @@ def deactivate_resolver(resolver_id):
     flash(f'Resolver "{resolver.name}" has been deactivated.', 'success')
     return redirect(url_for('admin.manage_resolvers'))
 
-# =======================================
-# User Management
-# =======================================
 @admin_bp.route('/users')
 @admin_required
 def list_users():

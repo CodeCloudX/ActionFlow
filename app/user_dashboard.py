@@ -9,9 +9,6 @@ from sqlalchemy import func
 
 user_bp = Blueprint('user', __name__)
 
-# =======================================
-# User Dashboard & Org Info
-# =======================================
 @user_bp.route('/dashboard')
 @user_required
 def dashboard():
@@ -20,14 +17,12 @@ def dashboard():
     user = User.query.get(user_id)
     organization = user.organization
 
-    # Get statistics for the logged-in user - using lowercase status values
     total_complaints = Complaint.query.filter_by(user_id=user_id).count()
     pending_complaints = Complaint.query.filter_by(user_id=user_id, status='pending').count()
     inprogress_complaints = Complaint.query.filter_by(user_id=user_id, status='in_progress').count()
     resolved_complaints = Complaint.query.filter_by(user_id=user_id, status='resolved').count()
     closed_complaints = Complaint.query.filter_by(user_id=user_id, status='closed').count()
 
-    # Get recent complaints for the user, sorted by the most recent activity (update or creation)
     recent_complaints = Complaint.query.filter_by(user_id=user_id).order_by(func.coalesce(Complaint.updated_at, Complaint.created_at).desc()).limit(4).all()
 
     return render_template('user/dashboard.html',
@@ -39,9 +34,6 @@ def dashboard():
                            closed_complaints=closed_complaints,
                            recent_complaints=recent_complaints)
 
-# =======================================
-# Complaint & Profile Management
-# =======================================
 @user_bp.route('/complaints/new', methods=['GET', 'POST'])
 @user_required
 def file_complaint():
@@ -52,15 +44,14 @@ def file_complaint():
         user_id = session.get('user_id')
         category = request.form.get('category')
         description = request.form.get('description')
-        priority = request.form.get('priority', 'medium')  # Changed default to lowercase
+        priority = request.form.get('priority', 'medium')
         other_category_text = request.form.get('other_category')
         complaint_image_file = request.files.get('complaint_image')
 
         if category == 'other' and other_category_text:
             category = other_category_text
 
-        # Normalize priority to lowercase
-        priority = priority.strip().lower()  # Added normalization
+        priority = priority.strip().lower()
 
         image_filename = save_uploaded_file(complaint_image_file, organization.org_unique_id, Config.COMPLAINT_UPLOAD_SUBFOLDER)
         complaint_id = generate_complaint_id(organization.org_unique_id)
@@ -70,20 +61,17 @@ def file_complaint():
             org_id=org_id,
             category=category,
             description=description,
-            priority=priority,  # Removed .capitalize()
+            priority=priority,
             complaint_image=image_filename,
             complaint_id=complaint_id,
-            status='pending',  # All new complaints start as pending
+            status='pending',
             created_at=datetime.now(timezone.utc)
         )
 
-        # Auto-assign high-priority complaints
-        if new_complaint.priority == 'high':  # Changed from 'High' to 'high'
-            # Find all active resolvers for this category
+        if new_complaint.priority == 'high':
             resolvers = Resolver.query.filter_by(org_id=org_id, category=category, status='active').all()
 
             if resolvers:
-                # Count active complaints for each resolver
                 q = db.session.query(Complaint.resolver_id, func.count(Complaint.id)).filter(
                     Complaint.resolver_id.in_([r.id for r in resolvers]),
                     Complaint.status.in_(['pending', 'in_progress'])
@@ -91,7 +79,6 @@ def file_complaint():
 
                 complaint_counts = {resolver_id: count for resolver_id, count in q}
 
-                # Find the resolver with the minimum number of complaints
                 min_complaints = float('inf')
                 best_resolver = None
                 for resolver in resolvers:
@@ -146,7 +133,6 @@ def complaint_details(complaint_id):
     if complaint.user_id != user_id:
         return jsonify({'success': False, 'message': 'Not authorized'}), 403
 
-    # Fixed: Handle None values for image URLs
     complaint_image_url = None
     if complaint.complaint_image:
         complaint_image_url = f"/static/uploads/{complaint.complaint_image.replace('\\', '/')}"
@@ -216,18 +202,15 @@ def submit_feedback(complaint_id):
         complaint.status = 'closed'
         complaint.updated_at = datetime.now(timezone.utc)
 
-        # FIXED: Resolver rating calculation bug
         if complaint.resolver:
-            # Get OLD ratings (excluding current complaint)
             old_complaints = Complaint.query.filter(
                 Complaint.resolver_id == complaint.resolver_id,
                 Complaint.id != complaint.id,
                 Complaint.rating.isnot(None)
             ).all()
 
-            # Calculate average including current rating
             old_ratings = [c.rating for c in old_complaints]
-            all_ratings = old_ratings + [rating]  # Add current rating
+            all_ratings = old_ratings + [rating]
 
             if all_ratings:
                 complaint.resolver.rating = sum(all_ratings) / len(all_ratings)
@@ -250,8 +233,8 @@ def organization_info():
     organization = Organization.query.get_or_404(org_id)
 
     return render_template('common/org_info.html',
-                           organization=organization
-                          
+                           organization=organization)
+
 @user_bp.route('/profile')
 @user_required
 def profile():

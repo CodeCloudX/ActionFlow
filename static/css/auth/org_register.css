@@ -54,13 +54,6 @@
         .register-header h2 i {
             color: #3498db;
         }
-        
-        .server-messages {
-            padding: 1rem;
-            text-align: center;
-            background: #f8d7da;
-            color: #721c24;
-        }
 
         .register-content {
             padding: 20px;

@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from model import db, Admin, User, Organization
 from services.email_service import send_org_registration_email, send_forgot_password_email
-from services.common_utils import is_password_valid, generate_organization_id, set_password_reset_token, clear_password_reset_token
+from services.common_utils import is_password_valid, is_email_valid, generate_organization_id, set_password_reset_token, clear_password_reset_token
 from datetime import datetime
 
 auth_bp = Blueprint('auth', __name__)
@@ -10,7 +10,6 @@ auth_bp = Blueprint('auth', __name__)
 def index():
     return redirect(url_for('auth.login'))
 
-# LOGIN (FOR ADMINS AND USERS)
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -18,7 +17,6 @@ def login():
         password = request.form.get('password')
         remember = request.form.get('remember')
 
-        # Check for admin first
         admin = Admin.query.filter_by(email=email).first()
         if admin and admin.check_password(password):
             session['user_id'] = admin.id
@@ -30,10 +28,8 @@ def login():
             flash('Admin login successful!', 'success')
             return redirect(url_for('admin.dashboard'))
 
-        # Then check for user
         user = User.query.filter_by(email=email).first()
         if user and user.check_password(password):
-            # Ensure user is active
             if user.status != 'active':
                 flash('Your account is inactive. Please contact your organization\'s administrator.', 'danger')
                 return redirect(url_for('auth.login'))
@@ -65,6 +61,10 @@ def admin_register():
         full_name = form_data.get('full_name')
         email = form_data.get('email')
         password = form_data.get('password')
+
+        if not is_email_valid(email) or not is_email_valid(org_email):
+            flash('Invalid email address format.', 'danger')
+            return render_template('auth/org_register.html', form_data=form_data)
 
         is_valid, message = is_password_valid(password)
         if not is_valid:
@@ -109,6 +109,10 @@ def user_register():
         email = form_data.get('email')
         password = form_data.get('password')
         org_unique_id = form_data.get('org_unique_id')
+
+        if not is_email_valid(email):
+            flash('Invalid email address format.', 'danger')
+            return render_template('auth/join_org.html', form_data=form_data)
 
         organization = Organization.query.filter_by(org_unique_id=org_unique_id).first()
         if not organization:

@@ -5,6 +5,7 @@ import secrets
 from werkzeug.utils import secure_filename
 from config import Config
 from datetime import datetime, timedelta
+from email_validator import validate_email, EmailNotValidError
 
 def is_password_valid(password):
     """
@@ -23,6 +24,17 @@ def is_password_valid(password):
     if not re.search(r"\d", password):
         return False, "Password must contain at least one number."
     return True, "Password is valid."
+
+def is_email_valid(email):
+    """
+    Validates an email address using the email-validator library.
+    Returns True if valid, False otherwise.
+    """
+    try:
+        validate_email(email)
+        return True
+    except EmailNotValidError:
+        return False
 
 def set_password_reset_token(user):
     """

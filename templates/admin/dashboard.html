@@ -18,9 +18,7 @@
         <p>Here's an overview of the platform's complaints and activities.</p>
     </div>
 
-    <!-- Statistics Cards -->
     <div class="stats-grid">
-        <!-- Total Complaints -->
         <a href="{{ url_for('admin.complaints') }}" class="stat-card">
             <div class="stat-icon icon-total">
                 <i class="fas fa-file-alt"></i>
@@ -31,7 +29,6 @@
             </div>
         </a>
 
-        <!-- Pending Complaints -->
         <a href="{{ url_for('admin.complaints', status='pending') }}" class="stat-card">
             <div class="stat-icon icon-pending">
                 <i class="fas fa-clock"></i>
@@ -42,7 +39,6 @@
             </div>
         </a>
 
-        <!-- High Priority Complaints -->
         <a href="{{ url_for('admin.complaints', priority='high', status='pending,in_progress') }}" class="stat-card">
             <div class="stat-icon icon-high">
                 <i class="fas fa-exclamation-triangle"></i>
@@ -53,7 +49,6 @@
             </div>
         </a>
 
-        <!-- In Progress Complaints -->
         <a href="{{ url_for('admin.complaints', status='in_progress') }}" class="stat-card">
             <div class="stat-icon icon-in-progress">
                 <i class="fas fa-sync-alt"></i>
@@ -64,7 +59,6 @@
             </div>
         </a>
 
-        <!-- Resolved Complaints -->
         <a href="{{ url_for('admin.complaints', status='resolved,closed') }}" class="stat-card">
             <div class="stat-icon icon-resolved">
                 <i class="fas fa-check-circle"></i>
@@ -76,7 +70,6 @@
         </a>
     </div>
 
-    <!-- Recent Activity -->
     <div class="activity-feed">
         <div class="activity-header">
             <i class="fas fa-history"></i>
