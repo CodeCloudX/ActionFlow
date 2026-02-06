@@ -53,7 +53,11 @@ def file_complaint():
 
         priority = priority.strip().lower()
 
-        image_filename = save_uploaded_file(complaint_image_file, organization.org_unique_id, Config.COMPLAINT_UPLOAD_SUBFOLDER)
+        image_filename, message = save_uploaded_file(complaint_image_file, organization.org_unique_id, Config.COMPLAINT_UPLOAD_SUBFOLDER)
+        if not image_filename:
+            flash(message, 'danger')
+            return redirect(url_for('user.file_complaint'))
+
         complaint_id = generate_complaint_id(organization.org_unique_id)
 
         new_complaint = Complaint(

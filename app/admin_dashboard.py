@@ -201,17 +201,24 @@ def resolve_complaint(complaint_id):
         flash('You are not authorized to resolve this complaint.', 'danger')
         return redirect(url_for('admin.complaints'))
 
+    if complaint.status != 'in_progress':
+        flash(f'Complaint {complaint.complaint_id} is not in a state that can be resolved.', 'warning')
+        return redirect(url_for('admin.complaints'))
+
     if request.method == 'POST':
+        resolution_note = request.form.get('resolution_note')
+        proof_image_file = request.files.get('proof_image')
+
+        if not resolution_note:
+            flash('Resolution notes are required.', 'danger')
+            return redirect(url_for('admin.resolve_complaint', complaint_id=complaint_id))
+
+        image_filename, message = save_uploaded_file(proof_image_file, organization.org_unique_id, Config.PROOF_UPLOAD_SUBFOLDER)
+        if not image_filename:
+            flash(message, 'danger')
+            return redirect(url_for('admin.resolve_complaint', complaint_id=complaint_id))
+
         try:
-            resolution_note = request.form.get('resolution_note')
-            proof_image_file = request.files.get('proof_image')
-
-            if not resolution_note:
-                flash('Resolution notes are required.', 'danger')
-                return redirect(url_for('admin.resolve_complaint', complaint_id=complaint_id))
-
-            image_filename = save_uploaded_file(proof_image_file, organization.org_unique_id, Config.PROOF_UPLOAD_SUBFOLDER)
-
             complaint.status = 'resolved'
             complaint.resolution_note = resolution_note
             complaint.updated_at = datetime.now(timezone.utc)

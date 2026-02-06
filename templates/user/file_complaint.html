@@ -64,17 +64,10 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label">Upload Image (Optional)</label>
-                <div class="file-upload" id="fileUpload">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    <p>Click to upload image or drag and drop</p>
-                    <p style="font-size: 0.8rem; color: #7f8c8d;">JPG, PNG up to 5MB</p>
-                    <input type="file" id="imageUpload" name="complaint_image" accept="image/*" style="display: none;">
-                </div>
-                <div id="filePreview" class="file-preview" style="display: none;">
-                    <i class="fas fa-file-image" style="color: #3498db;"></i>
-                    <span id="fileName"></span>
-                    <button type="button" id="removeFile" style="margin-left: auto; background: none; border: none; color: #e74c3c; cursor: pointer;">Remove</button>
+                <label class="form-label" for="complaint_image">Upload Complaint Image *</label>
+                <input type="file" id="complaint_image" name="complaint_image" class="form-control" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" required>
+                <div class="file-info">
+                    An image is required for clarity. Allowed types: JPG, PNG, WEBP (Max: 5MB)
                 </div>
             </div>
 

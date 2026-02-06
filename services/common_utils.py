@@ -7,6 +7,7 @@ from config import Config
 from datetime import datetime, timedelta
 from email_validator import validate_email, EmailNotValidError
 
+
 def is_password_valid(password):
     """
     Validates a password based on the following rules:
@@ -14,6 +15,7 @@ def is_password_valid(password):
     - At least one uppercase letter
     - At least one lowercase letter
     - At least one number
+    - At least one special Character
     """
     if len(password) < 8:
         return False, "Password must be at least 8 characters long."
@@ -23,7 +25,10 @@ def is_password_valid(password):
         return False, "Password must contain at least one lowercase letter."
     if not re.search(r"\d", password):
         return False, "Password must contain at least one number."
+    if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
+        return False, "Password must contain at least one special character."
     return True, "Password is valid."
+
 
 def is_email_valid(email):
     """
@@ -36,6 +41,7 @@ def is_email_valid(email):
     except EmailNotValidError:
         return False
 
+
 def set_password_reset_token(user):
     """
     Generates and sets a password reset token and its expiration for a user.
@@ -46,12 +52,14 @@ def set_password_reset_token(user):
     user.reset_token_expiration = datetime.utcnow() + timedelta(hours=1)
     return token
 
+
 def clear_password_reset_token(user):
     """
     Clears the password reset token and expiration from a user object.
     """
     user.reset_token = None
     user.reset_token_expiration = None
+
 
 def generate_organization_id():
     """
@@ -61,15 +69,16 @@ def generate_organization_id():
     base_id = str(uuid.uuid4().hex)[:8].upper()
     return f'ORG-{base_id}'
 
+
 def generate_complaint_id(org_unique_id):
     """
     Generates a unique, formatted complaint ID using the organization's unique ID.
     Example: 'CMP-E5F6-A1B2'
     """
     complaint_base_id = str(uuid.uuid4().hex)[:4].upper()
-    # Extracts 'E5F6' from 'ORG-E5F6G7H8'
     org_base_id = org_unique_id.split('-')[-1][:4]
     return f'CMP-{org_base_id}-{complaint_base_id}'
+
 
 def save_uploaded_file(file, org_id, subfolder):
     """
@@ -79,9 +88,14 @@ def save_uploaded_file(file, org_id, subfolder):
     - subfolder: The specific subfolder (e.g., 'complaints' or 'proof').
     """
     if not file or file.filename == '':
-        return None
+        return None, "File is missing."
 
     original_filename = secure_filename(file.filename)
+    file_ext = os.path.splitext(original_filename)[1].lower().lstrip('.')
+
+    if file_ext not in Config.ALLOWED_IMAGE_EXTENSIONS:
+        return None, "File type is not allowed."
+
     # Generate a unique prefix using a timestamp and a random string
     unique_prefix = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{secrets.token_hex(4)}"
     filename = f"{unique_prefix}_{original_filename}"
@@ -89,11 +103,18 @@ def save_uploaded_file(file, org_id, subfolder):
     # Physical path to save the file
     physical_upload_path = os.path.join(Config.BASE_UPLOAD_FOLDER, str(org_id), subfolder)
     os.makedirs(physical_upload_path, exist_ok=True)
-    file.save(os.path.join(physical_upload_path, filename))
+
+    file_path = os.path.join(physical_upload_path, filename)
+    file.save(file_path)
+
+    if os.path.getsize(file_path) > Config.MAX_CONTENT_LENGTH:
+        os.remove(file_path)  # Clean up the oversized file
+        return None, "File size exceeds the allowed limit."
 
     # Relative path to store in the database
     db_path = f'{org_id}/{subfolder}/{filename}'
-    return db_path
+    return db_path, "File uploaded successfully."
+
 
 def format_datetime(dt_object):
     """

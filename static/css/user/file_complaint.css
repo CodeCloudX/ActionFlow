@@ -30,7 +30,7 @@
     color: #2c3e50;
 }
 
-.form-input, .form-select, .form-textarea {
+.form-input, .form-select, .form-textarea, .form-control {
     width: 100%;
     padding: 10px 15px;
     border: 1px solid #ddd;
@@ -39,7 +39,7 @@
     transition: border-color 0.3s;
 }
 
-.form-input:focus, .form-select:focus, .form-textarea:focus {
+.form-input:focus, .form-select:focus, .form-textarea:focus, .form-control:focus {
     outline: none;
     border-color: #3498db;
 }
@@ -72,35 +72,6 @@
 .priority-medium .priority-dot { background-color: #f39c12; }
 .priority-low .priority-dot { background-color: #27ae60; }
 
-.file-upload {
-    border: 2px dashed #ddd;
-    border-radius: 4px;
-    padding: 30px;
-    text-align: center;
-    cursor: pointer;
-    transition: border-color 0.3s;
-}
-
-.file-upload:hover {
-    border-color: #3498db;
-}
-
-.file-upload i {
-    font-size: 2rem;
-    color: #3498db;
-    margin-bottom: 10px;
-}
-
-.file-preview {
-    margin-top: 10px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px;
-    background-color: #f8f9fa;
-    border-radius: 4px;
-}
-
 .submit-btn {
     background-color: #3498db;
     color: white;
@@ -119,4 +90,10 @@
 .other-category-input {
     margin-top: 10px;
     display: none;
+}
+
+.file-info {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-top: 5px;
 }
