@@ -1,4 +1,3 @@
-# decorators.py
 from flask import flash, redirect, url_for, session
 from functools import wraps
 from model import User, Admin
@@ -56,3 +55,4 @@ def user_required(f):
 
         return f(*args, **kwargs)
     return decorated_function
+
