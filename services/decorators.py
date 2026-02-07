@@ -25,11 +25,10 @@ def login_required(f):
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if session.get('role') != 'admin':
+        if 'user_id' not in session or session.get('role') != 'admin':
             flash('You do not have permission to access this page.', 'danger')
             return redirect(url_for('auth.login'))
-        
-        # Check if admin is still active
+
         admin = Admin.query.get(session['user_id'])
         if not admin:
             session.clear()
@@ -42,17 +41,18 @@ def admin_required(f):
 def user_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if session.get('role') != 'user':
+        if 'user_id' not in session or session.get('role') != 'user':
             flash('You do not have permission to access this page.', 'danger')
             return redirect(url_for('auth.login'))
 
-        # Check if user is still active
         user = User.query.get(session['user_id'])
         if not user or user.status != 'active':
             session.clear()
-            flash('Your account is inactive or has been deleted. Please contact your administrator.', 'danger')
+            flash(
+                'Your account is inactive or has been deleted. Please contact your administrator.',
+                'danger'
+            )
             return redirect(url_for('auth.login'))
 
         return f(*args, **kwargs)
     return decorated_function
-
