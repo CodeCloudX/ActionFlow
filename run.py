@@ -1,7 +1,6 @@
 import os
 import sys
-import psycopg2
-from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
+import mysql.connector # psycopg2 ko isse badal diya hai
 from sqlalchemy.engine.url import make_url
 from flask_migrate import init, migrate, upgrade, stamp, current
 
@@ -11,83 +10,73 @@ from config import Config
 def setup_database():
     """Ensures the database exists and is up-to-date with migrations."""
     db_url = Config.SQLALCHEMY_DATABASE_URI
-    url = make_url(db_url)
+    if not db_url:
+        print("\n--- DATABASE CONFIGURATION ERROR ---")
+        print("SQLALCHEMY_DATABASE_URI is not set. Please set it in your .env or config.py file.")
+        print("Example for MySQL: mysql+mysqlconnector://user:password@host/dbname")
+        exit(1)
 
-    # Connect to the default 'postgres' database to create the application's database
+    url = make_url(db_url)
+    db_name = url.database
+
+    # Connect to the MySQL server to create the application's database
     try:
-        conn = psycopg2.connect(
+        conn = mysql.connector.connect(
             host=url.host,
-            port=url.port,
+            port=url.port or 3306,
             user=url.username,
-            password=url.password,
-            dbname='postgres'
+            password=url.password
         )
-        conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cursor = conn.cursor()
 
-        cursor.execute(f"SELECT 1 FROM pg_database WHERE datname = '{url.database}'")
-        if not cursor.fetchone():
-            print(f"Database '{url.database}' not found. Creating...")
-            cursor.execute(f'CREATE DATABASE "{url.database}"')
-            print(f"Database '{url.database}' created.")
-        else:
-            print(f"Database '{url.database}' already exists.")
+        print(f"Checking for database '{db_name}'...")
+        # MySQL ke liye 'CREATE DATABASE IF NOT EXISTS' ka istemal karein
+        cursor.execute(f"CREATE DATABASE IF NOT EXISTS `{db_name}`")
+        print(f"Database '{db_name}' is ready.")
 
         cursor.close()
         conn.close()
-    except psycopg2.OperationalError as e:
+    except mysql.connector.Error as e:
         print(f"\n--- DATABASE CONNECTION ERROR ---")
-        print(f"Could not connect to PostgreSQL. Please ensure it is running and that the credentials in your .env or config.py are correct.")
+        print(f"Could not connect to MySQL. Please ensure it is running and that the credentials are correct.")
         print(f"Error details: {e}")
         exit(1)
     except Exception as e:
         print(f"An unexpected error occurred during database setup: {e}")
         exit(1)
 
-    # Create the Flask app to provide context for migrations
+    # Niche ka migration logic waise ka waisa hi rahega
     app = create_app()
     with app.app_context():
         from flask_migrate import Migrate
         from app import db
-
-        # Initialize migrations folder if not present
         if not os.path.exists('migrations'):
             print("Initializing database migrations folder...")
             init()
-
-        # Check if alembic_version table exists
         from sqlalchemy import inspect, text
         inspector = inspect(db.engine)
-
         if 'alembic_version' not in inspector.get_table_names():
             print("Alembic version table not found. Stamping with current revision...")
-            # Create alembic_version table and stamp it
             stamp()
         else:
             try:
-                # Check current database revision
                 with db.engine.connect() as conn:
                     result = conn.execute(text("SELECT version_num FROM alembic_version"))
                     current_rev = result.scalar()
                     print(f"Current database revision: {current_rev}")
             except Exception as e:
                 print(f"Error checking current revision: {e}")
-
-        # Generate migrations if there are changes
         print("Checking for model changes...")
         try:
             migrate(message="Auto-migration on startup.")
         except Exception as e:
             print(f"Migration generation notes: {e}")
-
-        # Always try to upgrade to head
         print("Applying migrations...")
         try:
             upgrade()
             print("Database schema is up-to-date.")
         except Exception as e:
             print(f"Warning during upgrade: {e}")
-            # If upgrade fails, try stamping with head and then upgrading
             print("Attempting to recover migration state...")
             try:
                 stamp(revision='head')
@@ -96,13 +85,9 @@ def setup_database():
             except Exception as e2:
                 print(f"Failed to recover migration state: {e2}")
                 print("You may need to manually resolve migration conflicts.")
-
     return app
 
 if __name__ == '__main__':
-    # Setup database and create the Flask app instance
     app = setup_database()
-
-    # Run the application
     print("\nStarting the application server on http://127.0.0.1:8000...")
     app.run(port=8000, debug=True, use_reloader=False)
