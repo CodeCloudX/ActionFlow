@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from model import db, Admin, User, Organization
+from services.decorators import login_required, guest_required
 from services.email_service import send_org_registration_email, send_forgot_password_email
 from services.common_utils import is_password_valid, is_email_valid, generate_organization_id, set_password_reset_token, clear_password_reset_token
 from datetime import datetime
@@ -7,14 +8,12 @@ from datetime import datetime
 auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/')
+@guest_required
 def index():
-    if 'user_id' in session:
-        if session.get('role') == 'admin':
-            return redirect(url_for('admin.dashboard'))
-        return redirect(url_for('user.dashboard'))
     return redirect(url_for('auth.login'))
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
+@guest_required
 def login():
     if request.method == 'POST':
         email = request.form.get('email')
@@ -53,6 +52,7 @@ def login():
     return render_template('auth/login.html')
 
 @auth_bp.route('/register/admin', methods=['GET', 'POST'])
+@guest_required
 def admin_register():
     if request.method == 'POST':
         form_data = request.form
@@ -106,6 +106,7 @@ def admin_register():
     return render_template('auth/org_register.html', form_data={})
 
 @auth_bp.route('/register/user', methods=['GET', 'POST'])
+@guest_required
 def user_register():
     if request.method == 'POST':
         form_data = request.form
@@ -146,6 +147,7 @@ def user_register():
     return render_template('auth/join_org.html', form_data={})
 
 @auth_bp.route('/logout')
+@login_required
 def logout():
     session.clear()
     flash('You have been logged out successfully.', 'info')
