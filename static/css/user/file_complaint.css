@@ -1,4 +1,3 @@
-/* Page-specific styles from your code */
 .form-container {
     background-color: white;
     border-radius: 8px;
@@ -96,4 +95,15 @@
     font-size: 0.9rem;
     color: #6c757d;
     margin-top: 5px;
+}
+
+@media (max-width: 768px) {
+    .form-container {
+        padding: 15px;
+    }
+
+    .priority-options {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 }

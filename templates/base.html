@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}ActionFlow{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='vendor/fontawesome-free-6.4.0-web/css/all.min.css') }}">
-    <!-- OR use external -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
 
     {% block head %}{% endblock %}
@@ -87,19 +85,28 @@
 
     <!-- MAIN CONTENT -->
     <div class="main-content">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="flash-container">
-                {% for category, message in messages %}
-                    <div class="flash-message flash-{{ category }}">
-                        {{ message }}
-                        <span class="close-flash" onclick="this.parentElement.style.display='none';">&times;</span>
+        <header class="top-header">
+            <div class="menu-btn">
+                <i class="fas fa-bars"></i>
+            </div>
+            <h2 class="page-title">{% block page_title %}{% endblock %}</h2>
+        </header>
+        
+        <main class="content-area">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-container">
+                    {% for category, message in messages %}
+                        <div class="flash-message flash-{{ category }}">
+                            {{ message }}
+                            <span class="close-flash" onclick="this.parentElement.style.display='none';">&times;</span>
+                        </div>
+                    {% endfor %}
                     </div>
-                {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
-        {% block content %}{% endblock %}
+                {% endif %}
+            {% endwith %}
+            {% block content %}{% endblock %}
+        </main>
     </div>
 </div>
 <script src="{{ url_for('static', filename='js/base.js') }}"></script>

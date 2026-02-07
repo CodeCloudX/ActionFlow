@@ -1,12 +1,18 @@
-   // Modal functionality
+document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('resolverModal');
     const openModalBtn = document.getElementById('openModalBtn');
     const closeModalBtns = document.querySelectorAll('.close-modal, .btn-cancel');
     const form = document.getElementById('resolverForm');
     const modalTitle = document.getElementById('modalTitle');
     const resolverIdInput = document.getElementById('resolverId');
+
+    if (!modal || !openModalBtn) return;
+
     const addResolverUrl = openModalBtn.dataset.addUrl;
     const editResolverUrl = openModalBtn.dataset.editUrl;
+
+    const openModal = () => modal.classList.add('show');
+    const closeModal = () => modal.classList.remove('show');
 
     // Open modal for adding new resolver
     openModalBtn.addEventListener('click', () => {
@@ -14,7 +20,7 @@
         form.reset();
         resolverIdInput.value = '';
         form.action = addResolverUrl;
-        modal.style.display = 'block';
+        openModal();
     });
 
     // Open modal for editing resolver
@@ -29,21 +35,19 @@
 
             form.action = editResolverUrl.replace('0', btn.dataset.id);
 
-            modal.style.display = 'block';
+            openModal();
         });
     });
 
     // Close modal
     closeModalBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            modal.style.display = 'none';
-        });
+        btn.addEventListener('click', closeModal);
     });
 
     // Close modal when clicking outside
-    window.addEventListener('click', (event) => {
+    modal.addEventListener('click', (event) => {
         if (event.target === modal) {
-            modal.style.display = 'none';
+            closeModal();
         }
     });
 
@@ -52,14 +56,14 @@
         event.preventDefault();
 
         const formData = new FormData(form);
+        const submitBtn = form.querySelector('.btn-submit');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Saving...';
 
         try {
             const response = await fetch(form.action, {
                 method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
+                body: new URLSearchParams(formData)
             });
 
             const result = await response.json();
@@ -72,5 +76,9 @@
         } catch (error) {
             console.error('Error:', error);
             alert('An error occurred while saving the resolver');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Save Resolver';
         }
     });
+});

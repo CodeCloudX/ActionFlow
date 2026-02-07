@@ -116,7 +116,7 @@
 .status-assigned { background-color: #e8f4fd; color: #3498db; }
 .status-resolved { background-color: #e8f7f0; color: #27ae60; }
 .status-closed { background-color: #e5e7e9; color: #7f8c8d; }
-.status-in_progress { background-color: #e8f4fd; color: #3498db; }
+.status-inprogress { background-color: #e8f4fd; color: #3498db; }
 
 .action-btn {
     padding: 6px 12px;
@@ -129,6 +129,12 @@
     text-decoration: none;
     display: inline-block;
     margin-right: 5px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
 }
 
 .action-btn.feedback-btn {
@@ -465,5 +471,51 @@ textarea.form-control {
     .description-box,
     .image-container {
         grid-column: span 1;
+    }
+
+    .complaints-table {
+        min-width: 100%;
+    }
+
+    .complaints-table thead {
+        display: none;
+    }
+
+    .complaints-table tr {
+        display: block;
+        margin-bottom: 15px;
+        border: 1px solid #e1e8ed;
+        border-radius: 8px;
+        padding: 10px;
+    }
+
+    .complaints-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #f1f2f6;
+    }
+    
+    .complaints-table tr td:last-child {
+        border-bottom: none;
+    }
+
+    .complaints-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    .action-btn {
+        padding: 5px 10px;
+        font-size: 0.8rem;
+        width: 100%;
+        text-align: center;
     }
 }

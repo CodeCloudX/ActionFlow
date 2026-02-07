@@ -6,6 +6,7 @@
     max-width: 800px;
     margin: auto;
 }
+
 .profile-header {
     display: flex;
     align-items: center;
@@ -14,6 +15,7 @@
     margin-bottom: 1.5rem;
     border-bottom: 1px solid #e1e8ed;
 }
+
 .profile-avatar-large {
     width: 100px;
     height: 100px;
@@ -26,27 +28,56 @@
     font-size: 3rem;
     font-weight: bold;
 }
+
 .profile-name h3 {
     font-size: 1.5rem;
     color: #2c3e50;
 }
+
 .profile-name p {
     color: #7f8c8d;
 }
+
 .detail-item {
     display: flex;
     padding: 1rem 0;
     border-bottom: 1px solid #f1f2f6;
     align-items: center;
 }
+
 .detail-item:last-child {
     border-bottom: none;
 }
+
 .detail-label {
     width: 200px;
     font-weight: 600;
     color: #2c3e50;
 }
+
 .detail-value {
     color: #555;
+}
+
+@media (max-width: 768px) {
+    .profile-card {
+        padding: 1rem;
+    }
+
+    .profile-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .detail-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+
+    .detail-label {
+        width: auto;
+        font-size: 0.9rem;
+        color: #7f8c8d;
+    }
 }
