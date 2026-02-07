@@ -1,6 +1,6 @@
 Flask
 Flask-SQLAlchemy
-psycopg2-binary
+mysql-connector-python
 python-dotenv
 email-validator
 APScheduler
