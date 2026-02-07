@@ -22,7 +22,7 @@ ActionFlow is a web-based platform designed to streamline complaint resolution w
 ### Prerequisites
 
 *   Python 3.x
-*   PostgreSQL
+*   MySQL
 
 ### Installation
 
@@ -62,4 +62,5 @@ ActionFlow is a web-based platform designed to streamline complaint resolution w
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 Copyright (c) 2026 CodeCloudX
+
 
