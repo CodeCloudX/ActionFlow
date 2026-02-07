@@ -26,17 +26,7 @@
         </div>
         {% block content %}{% endblock %}
     </div>
-    <script>
-    document.addEventListener('DOMContentLoaded', (event) => {
-        setTimeout(function() {
-            const flashMessages = document.querySelectorAll('.flash-message');
-            flashMessages.forEach(function(message) {
-                message.style.display = 'none';
-            });
-        }, 2000); // 2 seconds
-    });
-</script>
+    <script src="{{ url_for('static', filename='js/base.js') }}"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>
-
