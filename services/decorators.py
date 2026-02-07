@@ -3,6 +3,17 @@ from flask import flash, redirect, url_for, session
 from functools import wraps
 from model import User, Admin
 
+def guest_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' in session:
+            if session.get('role') == 'admin':
+                return redirect(url_for('admin.dashboard'))
+            elif session.get('role') == 'user':
+                return redirect(url_for('user.dashboard'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
