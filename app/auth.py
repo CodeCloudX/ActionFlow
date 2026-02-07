@@ -150,7 +150,7 @@ def user_register():
 @login_required
 def logout():
     session.clear()
-    flash('You have been logged out successfully.', 'info')
+    flash('You have been logged out.', 'info')
     return redirect(url_for('auth.login'))
 
 @auth_bp.route('/forgot-password', methods=['GET', 'POST'])
