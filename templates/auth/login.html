@@ -9,7 +9,7 @@
 {% block content %}
     <div class="login-container">
         <div class="login-header">
-            <h2>ActionsFlow Login</h2>
+            <h2>ActionFlow Login</h2>
         </div>
 
         <form id="loginForm" method="POST" action="{{ url_for('auth.login') }}">
@@ -60,3 +60,4 @@
 {% block scripts %}
     <script src="{{ url_for('static', filename='js/auth/login.js') }}"></script>
 {% endblock %}
+
