@@ -1,0 +1,124 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body, html {
+    height: 100%;
+    background-color: #f5f7fa;
+    color: #333;
+    min-height: 100vh;
+}
+
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    padding: 20px;
+}
+
+/* 
+--- Flash Message Container ---
+This holds the alerts at the top of the screen.
+*/
+.flash-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 500px;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.flash-message {
+    padding: 15px 20px;
+    border-radius: 5px;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    transform: translateY(-20px);
+    animation: fadeInDown 0.5s forwards;
+}
+
+@keyframes fadeInDown {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.flash-message .close-flash {
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 1.2rem;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    margin-left: 10px;
+    flex-shrink: 0;
+}
+
+.flash-message .close-flash:hover {
+    opacity: 1;
+}
+
+/* Flash Message Category Colors */
+.flash-success {
+    background-color: #28a745;
+}
+
+.flash-danger {
+    background-color: #dc3545;
+}
+
+.flash-info {
+    background-color: #17a2b8;
+}
+
+.flash-warning {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    .flash-container {
+        top: 10px;
+        width: 95%;
+    }
+
+    .flash-message {
+        padding: 12px 15px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+
+    .flash-message {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+    }
+}
